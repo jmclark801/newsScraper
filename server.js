@@ -26,7 +26,11 @@ app.use(express.json());
 app.use(express.static(__dirname + "/public"));
 
 // Connect to the Mongo DB
-mongoose.connect("mongodb://localhost/newsScraper", { useNewUrlParser: true });
+// Previous code: mongoose.connect("mongodb://localhost/newsScraper", { useNewUrlParser: true });
+// new code for Heroku mongo:
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/newsScraper";
+mongoose.connect(MONGODB_URI);
+
 
 // Routes
 
