@@ -1,32 +1,30 @@
 <!DOCTYPE html>
 <html lang="en-us">
-
 <head>
   <meta charset="UTF-8">
-  <title>Daily News Brief</title>
+  <title>Saved Articles</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
   <ul class="nav nav-pills">
     <li class="nav logo">
-      Daily News Brief
+      Saved Articles
     </li>
     <li class="nav-item">
       <a class="nav-link active" href="/">Home</a>
     </li>
-    <li class="nav-item">
-      <a class="nav-link" href="/saved">Saved Articles</a>
+    <li class="nav-saved">
+      <a class="nav-link" id="nav-saved" href="/saved">Saved Articles</a>
     </li>
     <li class="nav-item" id="scrape">
       <a class="nav-link" href="#">Get Latest News</a>
     </li>
   </ul>
   <div id="wrapper">
-    <h1>Daily News Brief</h1>
-    <div id="articles"></div>
+    <h1>Saved Articles</h1>
+    <div id="saved-articles"></div>
     <div id="notes"></div>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>

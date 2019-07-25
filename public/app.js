@@ -1,59 +1,68 @@
-// Grab the articles as a json
-$.getJSON("/articles", function (data) {
-  // For each one
-  for (var i = 0; i < data.length; i++) {
-    // Build the element to be displayed on the page
-    let articleElement = "<div class='article-wrapper'>";
-    // Add the article headline
-    articleElement += "<p class ='article-headline' data-id='" + data[i]._id + "'>" + data[i].title
-    // Add a 'save' button
-    articleElement += "<button class='btn btn-secondary article-save' style='float: right;'>Save</button></p>"
-    // Video articles don't have a link and instead show 'javascript:void(0)
-    // This block handles that condition
-    if(data[i].link != "javascript:void(0);") {
-      articleElement += `<p class="article-link">${data[i].link} </p>`;
-    } else {
-      articleElement += `<p class="article-link--unavailable"> (Link Not Available) </p>`;
-    }
-    articleElement +="</div>"
-    $("#articles").append(articleElement);
-  }
-});
-
-$(document).on("click", ".article-save", function(){
+$(document).on("click", ".article-save", function () {
   console.log("Button was clicked");
   var idToSave = $(this).parent().attr("data-id");
   console.log(idToSave);
 
   // Now make an ajax call for the Article
   $.ajax({
-      method: "PUT",
-      url: "/articles/" + idToSave,
-    }).then(function(data){
-
-    });
+    method: "PUT",
+    url: "/articles/" + idToSave,
+  }).then(function (data) {});
 });
 
-$("#scrape").on("click", function(event) {
+$("#scrape").on("click", function (event) {
   event.preventDefault()
   console.log("....Gathering the news!");
   $.ajax({
     method: "GET",
     url: "/scrape"
-  }).then(function (data) {
-  })
+  }).then(function (data) {})
 })
 
-$("#nav-saved").on("click", function(){
-  event.preventDefault();
-  console.log("...finding saved articles");
-  $.ajax({
-    method: "GET",
-    url: "/saved"
-  }).then(function(data){
-    console.log(data);
-  });
-});
+$(".nav-saved").on("click", function () {
+    // event.preventDefault();
+    console.log("...finding saved articles");
+    
+    $.getJSON({
+      method: "GET",
+      url: "/savedArticles"
+    }).then(function (data) {
+        // $("#saved-articles").empty();
+        // build the page using jquery
+        console.log(`${data.length} saved articles found.`)
+        console.log(`logging data: ${data[0].title}`);
+        for (var i = 0; i < data.length; i++) {
+          // Build the element to be displayed on the page
+          let articleElement = "<h1>Saved Articles</h1><div class='article-wrapper'>";
+          // Add the article headline
+          articleElement += "<p class ='article-headline' data-id='" + data[i]._id + "'>" + data[i].title
+          // Add a 'save' button
+          articleElement += "<button class='btn btn-secondary article-delete' style='float: right;'>Delete</button></p>"
+          // Video articles don't have a link and instead show 'javascript:void(0)
+          // This block handles that condition
+          if (data[i].link != "javascript:void(0);") {
+            articleElement += `<a class="article-link" href=${data[i].link}>${data[i].link} </p>`;
+          } else {
+            articleElement += `<p class="article-link--unavailable"> (Link Not Available) </p>`;
+          }
+          articleElement += "</div>"
+          return articleElement
+        };
+    })
+  .then(function (articleElement) {
+    // window.location.href = "/saved.html";
+      // $.ajax({
+      //   method: "GET",
+      //   URL: "/saved"
+      // }).then(function(data){
+        console.log(`This is the data received in the ajax .then ${data}`);
+        console.log(`The article Element is ${articleElement}`);
+       $("#saved-articles").append(articleElement);
+      })
+      // 
+    }
+  );
+// });
 
 
 // Reference Code Below:

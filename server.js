@@ -1,7 +1,7 @@
 var express = require("express");
 var logger = require("morgan");
 var mongoose = require("mongoose");
-
+var path = require('path');
 // Our scraping tools
 // Axios is a promised-based http library, similar to jQuery's Ajax method
 // It works on the client and on the server
@@ -23,7 +23,7 @@ app.use(logger("dev"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 // Make public a static folder
-app.use(express.static("public"));
+app.use(express.static(__dirname + "/public"));
 
 // Connect to the Mongo DB
 mongoose.connect("mongodb://localhost/newsScraper", { useNewUrlParser: true });
@@ -38,26 +38,26 @@ app.get("/scrape", function(req, res) {
     var $ = cheerio.load(response.data);
     // Now, we grab every a tag tag, and do the following:
     $(".headlines-li-div").each(function(i, element) {
+      if(i < 10) {
+       
       // Save an empty result object
       var result = {};
       // Add the text and href of every link, and save them as properties of the result object
       result.title = $(this)
         .find("a")
-        .text();
+        .text()
+        .trim();
       result.link = $(this)
         .find("a")
         .attr("href");
       
-      //Create a new Article using the `result` object built from scraping
-      db.Article.create(result)
-        .then(function(dbArticle) {
-          // View the added result in the console
-          console.log(dbArticle);
-        })
+      db.Article.findOneAndUpdate({ title: result.title }, result, { upsert: true, new: true, runValidators: true, setDefaultsOnInsert: true })
+        .then(function(dbArticle) {})
         .catch(function(err) {
-          // If an error occurred, log it
           console.log(err);
         });
+      }
+
     });
 
     // Send a message to the client
@@ -70,8 +70,6 @@ app.get("/articles", function(req, res) {
   // Grab every document in the Articles collection
   db.Article.find({})
     .then(function(dbArticle) {
-      // If successful find Articles, send them back to the client
-      console.log(dbArticle);
       res.json(dbArticle);
     })
     .catch(function(err) {
@@ -81,7 +79,6 @@ app.get("/articles", function(req, res) {
 });
 
 app.put("/articles/:id", function(req, res){
-  console.log("in app.put!")
   db.Article.findOneAndUpdate({
     _id: req.params.id
   }, { saved: true})
@@ -90,15 +87,26 @@ app.put("/articles/:id", function(req, res){
   );
 });
 
-app.get("/saved", function(req, res){
+/// Need one route for JSON /savedArticles
+app.get("/savedArticles", function(req, res){
   db.Article.find({
     saved: true
   }).then(function(dbArticle){
-    console.log(dbArticle);
-    // https://stackoverflow.com/questions/34796878/how-to-pass-data-between-routes-in-express
-    res.render('/saved', { savedArticles: dbArticle });
+    if (dbArticle) {
+      console.log(`Logging dbArticle contents: ${dbArticle}`);
+      res.json(dbArticle)
+    } else {
+      console.log(`No articles found`);
+    }
   });
 });
+
+// Need one route for /saved to return '/saved' page
+// app.get("/saved", function(req, res){
+//   console.log(`This is the response to app.get("saved") ${res}`);
+//   // res.render(path.join(__dirname, 'public', 'saved.html'));
+//   res.render('saved');
+// });
 
 // Route for grabbing a specific Article by id, populate it with it's note
 app.get("/articles/:id", function(req, res) {
