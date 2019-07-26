@@ -151,6 +151,7 @@ app.post("/articles/:id", function(req, res) {
 });
 
 // Start the server
-app.listen(PORT, function() {
+//.listen(process.env.PORT || 5000)
+app.listen(process.env.PORT || 5000, function() {
   console.log("App running on port " + PORT + "!");
 });
